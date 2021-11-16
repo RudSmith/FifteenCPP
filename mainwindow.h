@@ -19,9 +19,12 @@ public:
 
 public slots:
     // Получен сигнал о перемещении плитки, обрабатываем его
-    void moveTile(QPoint tile_pos);
+    void moveTile(Tile * tile_to_move);
 
 private:
+    // Проверить, куда можно передвинуть плитку
+    QPoint checkTilePossibleTurn(QPoint tile_pos);
+
     Ui::MainWindow *ui;
     // Массив плиток
     QVector<Tile*> m_tiles;

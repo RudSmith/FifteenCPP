@@ -27,22 +27,22 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::moveTile(QPoint tile_pos)
+void MainWindow::moveTile(Tile * tile_to_move)
 {
-    // Сохраняем нажатую плитку в виде layoutItem* и Tile*
-    auto pressed_tile_layout_item = ui->gridLayout->itemAtPosition(tile_pos.x(), tile_pos.y());
-    Tile *pressed_tile = nullptr;
-
-    for (auto & tile : m_tiles) {
-        if(tile->get_current_pos() == tile_pos){
-            pressed_tile = tile;
-            break;
-        }
-    }
-
+    auto tile_at_grid = ui->gridLayout->itemAtPosition(tile_to_move->get_current_pos().x(), tile_to_move->get_current_pos().y());
     // Убираем с лэйаута нажатую плитку
-    ui->gridLayout->removeItem(pressed_tile_layout_item);
+    ui->gridLayout->removeItem(tile_at_grid);
 
+    // Проверяем, куда плитку можно переместить
+    QPoint new_pos = checkTilePossibleTurn(tile_to_move->get_current_pos());
+
+    // Помещаем её на новую позицию, перед этим обновив свойство current_pos у Tile
+    tile_to_move->set_current_pos(new_pos);
+    ui->gridLayout->addItem(tile_at_grid, new_pos.x(), new_pos.y());
+}
+
+QPoint MainWindow::checkTilePossibleTurn(QPoint tile_pos)
+{
     int new_x{};
     int new_y{};
 
@@ -68,8 +68,6 @@ void MainWindow::moveTile(QPoint tile_pos)
         new_y = tile_pos.y();
     }
 
-    // Помещаем её на новую позицию, перед этим обновив свойство current_pos у Tile
-    pressed_tile->set_current_pos(QPoint(new_x, new_y));
-    ui->gridLayout->addItem(pressed_tile_layout_item, new_x, new_y);
+    return QPoint(new_x, new_y);
 }
 

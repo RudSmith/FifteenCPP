@@ -39,5 +39,5 @@ void Tile::set_current_pos(QPoint pos)
 
 void Tile::mousePressEvent(QMouseEvent *e)
 {
-    emit needToMove(m_current_pos);
+    emit needToMove(this);
 }

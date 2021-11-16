@@ -31,7 +31,7 @@ public:
 
 signals:
     // Сигнал о том, что плитка нуждается в перемещении
-    void needToMove(QPoint);
+    void needToMove(Tile *);
 
 private:
     // Начальная позиция
