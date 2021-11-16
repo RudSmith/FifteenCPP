@@ -24,6 +24,10 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    for (int i = 0; i < m_tiles.size(); ++i) {
+        delete m_tiles[i];
+    }
+
     delete ui;
 }
 
