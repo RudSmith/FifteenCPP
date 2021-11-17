@@ -86,6 +86,13 @@
       </spacer>
      </item>
      <item>
+      <widget class="QPushButton" name="start_pushButton">
+       <property name="text">
+        <string>Начать игру</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="replay_pushButton">
        <property name="text">
         <string>Начать заново</string>
@@ -96,13 +103,6 @@
       <widget class="QPushButton" name="upload_image_pushButton">
        <property name="text">
         <string>Загрузить картинку...</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="mix_pushButton">
-       <property name="text">
-        <string>Перемешать</string>
        </property>
       </widget>
      </item>

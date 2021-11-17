@@ -28,17 +28,17 @@ private slots:
     // Обновить таймер
     void updateTimer();
     // Начать игру
+    void startGame();
+    // Начать игру
     void restartGame();
-    // Перемешать плитки
-    void mixTiles();
 
 private:
     // Проверить, куда можно передвинуть плитку
     QPoint checkTilePossibleTurn(QPoint tile_pos);
     // Обновить счётчик ходов
     void updateTurnsCount();
-    // Начать игру
-    void startGame();
+    // Перемешать плитки
+    void mixTiles();
 
     Ui::MainWindow *ui;
     // Массив плиток

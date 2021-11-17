@@ -20,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent)
             if(i * m_row_count + j == m_row_count * m_column_count - 1)
                 break;
             m_tiles[i * m_row_count + j] = new Tile(QPoint(i, j));
-
+            m_tiles[i * m_row_count + j]->setEnabled(false);
             // TODO Убрать позже!!
             m_tiles[i * m_row_count + j]->setText(QString::number(i * m_row_count + j));
 
@@ -40,7 +40,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->replay_pushButton, &QPushButton::clicked, this, &MainWindow::restartGame);
 
     // Настраиваем кнопку "Перемешать"
-    connect(ui->mix_pushButton, &QPushButton::clicked, this, &MainWindow::mixTiles);
+    connect(ui->start_pushButton, &QPushButton::clicked, this, &MainWindow::startGame);
 }
 
 MainWindow::~MainWindow()
@@ -63,11 +63,6 @@ void MainWindow::moveTile(Tile * tile_to_move)
 
     // Обновляем счётчик ходов, если плитка сдвинулась
     if(new_pos != tile_to_move->get_current_pos()) {
-        // Если ходов ещё не было, запускаем таймер
-        if(m_turns_count == 0){
-            startGame();
-        }
-
         updateTurnsCount();
     }
 
@@ -106,15 +101,26 @@ void MainWindow::updateTurnsCount()
 
 void MainWindow::startGame()
 {
+    mixTiles();
+
+    for (auto & tile : m_tiles) {
+        tile->setEnabled(true);
+    }
+
+    m_is_game_started = true;
     m_timer->start();
     ui->replay_pushButton->setEnabled(true);
-    ui->mix_pushButton->setEnabled(false);
+    ui->start_pushButton->setEnabled(false);
 }
 
 void MainWindow::restartGame()
 {
+    for (auto & tile : m_tiles) {
+        tile->setEnabled(false);
+    }
+
     ui->replay_pushButton->setEnabled(false);
-    ui->mix_pushButton->setEnabled(true);
+    ui->start_pushButton->setEnabled(true);
 
     ui->time_label->setText("00:00");
     ui->turns_count_label->setText("0");
