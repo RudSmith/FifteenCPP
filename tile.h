@@ -3,7 +3,6 @@
 
 #include <QPushButton>
 #include <QWidget>
-#include <QString>
 #include <QPoint>
 #include <QMouseEvent>
 
