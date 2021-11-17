@@ -39,6 +39,8 @@ private:
     void updateTurnsCount();
     // Перемешать плитки
     void mixTiles();
+    // Проверить, решается ли текущая комбинация
+    bool isSolvable();
 
     Ui::MainWindow *ui;
     // Массив плиток

@@ -116,6 +116,8 @@ void MainWindow::startGame()
 
 void MainWindow::restartGame()
 {
+    m_is_game_started = false;
+
     for (auto & tile : m_tiles) {
         tile->setEnabled(false);
     }
@@ -146,7 +148,6 @@ void MainWindow::restartGame()
 
     for (auto & tile : m_tiles) {
         ui->gridLayout->addWidget(tile, tile->get_current_pos().x(), tile->get_current_pos().y());
-        qDebug() << tile->get_value() << " " << tile->get_current_pos() << " " << tile->get_initial_pos();
     }
 }
 
@@ -165,9 +166,38 @@ void MainWindow::mixTiles()
         m_tiles[new_index]->set_current_pos(temp);
     }
 
+    int c = 0;
+
+    while (!isSolvable()) {
+        ++c;
+        for (int i = 0; i < m_tiles.size(); ++i) {
+            int new_index = QRandomGenerator::global()->bounded(0, m_tiles_count - 1);
+            m_tiles.swapItemsAt(i, new_index);
+
+            QPoint temp = m_tiles[i]->get_current_pos();
+            m_tiles[i]->set_current_pos(m_tiles[new_index]->get_current_pos());
+            m_tiles[new_index]->set_current_pos(temp);
+        }
+    }
+
     for (auto & tile : m_tiles) {
         ui->gridLayout->addWidget(tile, tile->get_current_pos().x(), tile->get_current_pos().y());
     }
+}
+
+bool MainWindow::isSolvable()
+{
+    int sum = 0;
+
+    for (int i = 0; i < m_tiles.size(); ++i) {
+        for (int j = 0; j < i; ++j) {
+            if (m_tiles[j]->get_value() > m_tiles[i]->get_value())
+                ++sum;
+        }
+    }
+
+    sum += 1 + ((m_tiles.size() - 1) / m_row_count);
+    return (sum % 2 == 0);
 }
 
 void MainWindow::updateTimer()
