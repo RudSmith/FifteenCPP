@@ -4,6 +4,7 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
       ui(new Ui::MainWindow),
+      m_timer { nullptr },
       m_time_passed(0, 0, 0),
       m_turns_count{}
 {
