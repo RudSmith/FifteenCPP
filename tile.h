@@ -13,12 +13,14 @@ class Tile : public QPushButton
 public:
     Tile(QWidget *parent = nullptr);
     // Конструктор с установкой начального положения
-    Tile(QPoint init_pos, QWidget *parent = nullptr);
+    Tile(QPoint init_pos, int value, QWidget *parent = nullptr);
 
     // Получить начальную позицию
     QPoint get_initial_pos() const;
     // Получить текущую позицию
     QPoint get_current_pos() const;
+    // Получить порядковый номер
+    int get_value() const;
 
     // Установить начальную позицию
     void set_initial_pos(QPoint pos);
@@ -37,6 +39,8 @@ private:
     QPoint m_initial_pos;
     // Текущая позиция
     QPoint m_current_pos;
+    // Числовое значение (на какой позиции от 0 до 15 плитка должна стоять)
+    int m_value;
 };
 
 #endif // TILE_H

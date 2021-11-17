@@ -8,10 +8,11 @@ Tile::Tile(QWidget *parent)
     setMaximumSize(101, 81);
 }
 
-Tile::Tile(QPoint init_pos, QWidget *parent)
+Tile::Tile(QPoint init_pos, int value, QWidget *parent)
     : QPushButton(parent),
       m_initial_pos { init_pos },
-      m_current_pos { m_initial_pos }
+      m_current_pos { m_initial_pos },
+      m_value { value }
 {
     setMinimumSize(101, 81);
     setMaximumSize(101, 81);
@@ -25,6 +26,11 @@ QPoint Tile::get_initial_pos() const
 QPoint Tile::get_current_pos() const
 {
     return m_current_pos;
+}
+
+int Tile::get_value() const
+{
+    return m_value;
 }
 
 void Tile::set_initial_pos(QPoint pos)

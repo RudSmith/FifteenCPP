@@ -19,10 +19,11 @@ MainWindow::MainWindow(QWidget *parent)
         for (int j = 0; j < m_column_count; ++j) {
             if(i * m_row_count + j == m_row_count * m_column_count - 1)
                 break;
-            m_tiles[i * m_row_count + j] = new Tile(QPoint(i, j));
+            m_tiles[i * m_row_count + j] = new Tile(QPoint(i, j), i * m_row_count + j + 1);
             m_tiles[i * m_row_count + j]->setEnabled(false);
+
             // TODO Убрать позже!!
-            m_tiles[i * m_row_count + j]->setText(QString::number(i * m_row_count + j));
+            m_tiles[i * m_row_count + j]->setText(QString::number(m_tiles[i * m_row_count + j]->get_value()));
 
             ui->gridLayout->addWidget(m_tiles[i * m_row_count + j], i, j);
             connect(m_tiles[i * m_row_count + j], &Tile::needToMove, this, &MainWindow::moveTile);
@@ -147,43 +148,21 @@ void MainWindow::restartGame()
 
 void MainWindow::mixTiles()
 {
-    // В цикле проходим по всему гриду и свапаем элементы
-    for(int i = 0; i < m_row_count; ++i){
-        for (int j = 0; j < m_column_count; ++j) {
-            // У нас 15 плиток, так что на 16 элементе выходим из цикла
-            if(i * m_row_count + j == m_row_count * m_column_count - 1)
-                break;
+    for (auto & tile : m_tiles) {
+        ui->gridLayout->removeWidget(tile);
+    }
 
-            // Генерируем два числа - строку и столбец, с которой будем свапать текущий элемент
-            int new_row = QRandomGenerator::global()->bounded(0, m_row_count - 1);
-            int new_column = QRandomGenerator::global()->bounded(0, m_row_count - 1);
+    for (int i = 0; i < m_tiles.size(); ++i) {
+        int new_index = QRandomGenerator::global()->bounded(0, m_tiles_count - 1);
+        m_tiles.swapItemsAt(i, new_index);
 
-            // Получаем указатели на текущий и подлежащий обмену элемент грида
-            auto tile_1 = ui->gridLayout->itemAtPosition(i, j);
-            auto tile_2 = ui->gridLayout->itemAtPosition(new_row, new_column);
+        QPoint temp = m_tiles[i]->get_current_pos();
+        m_tiles[i]->set_current_pos(m_tiles[new_index]->get_current_pos());
+        m_tiles[new_index]->set_current_pos(temp);
+    }
 
-            // Получаем итератор на текущий элемент в векторе
-            QVector<Tile*>::iterator it_1 = std::find_if(m_tiles.begin(), m_tiles.end(), [i, j](Tile *p){
-                    return p->get_current_pos() == QPoint(i, j);
-                }
-            );
-
-            // Получаем итератор на подлежащий обмену элемент в векторе
-            QVector<Tile*>::iterator it_2 = std::find_if(m_tiles.begin(), m_tiles.end(), [new_row, new_column](Tile *p){
-                    return p->get_current_pos() == QPoint(new_row, new_column);
-                }
-            );
-
-            // Обмениваем позициями плитки
-            ui->gridLayout->removeItem(tile_1);
-            ui->gridLayout->removeItem(tile_2);
-
-            (*it_1)->set_current_pos(QPoint(new_row, new_column));
-            (*it_2)->set_current_pos(QPoint(i, j));
-
-            ui->gridLayout->addItem(tile_1, new_row, new_column);
-            ui->gridLayout->addItem(tile_2, i, j);
-        }
+    for (auto & tile : m_tiles) {
+        ui->gridLayout->addWidget(tile, tile->get_current_pos().x(), tile->get_current_pos().y());
     }
 }
 
