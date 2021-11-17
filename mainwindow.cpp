@@ -6,7 +6,8 @@ MainWindow::MainWindow(QWidget *parent)
       ui(new Ui::MainWindow),
       m_timer { nullptr },
       m_time_passed(0, 0, 0),
-      m_turns_count{}
+      m_turns_count{},
+      m_is_game_started { false }
 {
     ui->setupUi(this);
 
@@ -27,6 +28,8 @@ MainWindow::MainWindow(QWidget *parent)
             connect(m_tiles[i * m_row_count + j], &Tile::needToMove, this, &MainWindow::moveTile);
         }
     }
+
+    ui->replay_pushButton->setEnabled(false);
 
     // Настраиваем таймер
     m_timer = new QTimer();
@@ -61,8 +64,9 @@ void MainWindow::moveTile(Tile * tile_to_move)
     // Обновляем счётчик ходов, если плитка сдвинулась
     if(new_pos != tile_to_move->get_current_pos()) {
         // Если ходов ещё не было, запускаем таймер
-        if(m_turns_count == 0)
-            m_timer->start();
+        if(m_turns_count == 0){
+            startGame();
+        }
 
         updateTurnsCount();
     }
@@ -100,8 +104,18 @@ void MainWindow::updateTurnsCount()
     ui->turns_count_label->setText(QString::number(m_turns_count));
 }
 
+void MainWindow::startGame()
+{
+    m_timer->start();
+    ui->replay_pushButton->setEnabled(true);
+    ui->mix_pushButton->setEnabled(false);
+}
+
 void MainWindow::restartGame()
 {
+    ui->replay_pushButton->setEnabled(false);
+    ui->mix_pushButton->setEnabled(true);
+
     ui->time_label->setText("00:00");
     ui->turns_count_label->setText("0");
 

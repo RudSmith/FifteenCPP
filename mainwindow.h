@@ -37,6 +37,8 @@ private:
     QPoint checkTilePossibleTurn(QPoint tile_pos);
     // Обновить счётчик ходов
     void updateTurnsCount();
+    // Начать игру
+    void startGame();
 
     Ui::MainWindow *ui;
     // Массив плиток
@@ -46,6 +48,7 @@ private:
     // Время с начала игры
     QTime m_time_passed;
 
+    // Кол-во ходов
     int m_turns_count;
 
     // Количество плиток
@@ -54,5 +57,7 @@ private:
     const int m_row_count = 4;
     // Кол-во столбцов поля
     const int m_column_count = 4;
+
+    bool m_is_game_started;
 };
 #endif // MAINWINDOW_H
