@@ -42,6 +42,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Настраиваем кнопку "Перемешать"
     connect(ui->start_pushButton, &QPushButton::clicked, this, &MainWindow::startGame);
+
+    // TODO Считываем таблицу лидеров
+
 }
 
 MainWindow::~MainWindow()
@@ -50,6 +53,7 @@ MainWindow::~MainWindow()
         delete m_tiles[i];
     }
 
+    delete m_timer;
     delete ui;
 }
 
@@ -70,6 +74,11 @@ void MainWindow::moveTile(Tile * tile_to_move)
     // Помещаем её на новую позицию, перед этим обновив свойство current_pos у Tile
     tile_to_move->set_current_pos(new_pos);
     ui->gridLayout->addItem(tile_at_grid, new_pos.x(), new_pos.y());
+
+    // Если игра решена, выводим сообщение о победе
+    if(isSolved()) {
+        finishGame();
+    }
 }
 
 QPoint MainWindow::checkTilePossibleTurn(QPoint tile_pos)
@@ -102,7 +111,7 @@ void MainWindow::updateTurnsCount()
 
 void MainWindow::startGame()
 {
-    mixTiles();
+    //mixTiles();
 
     for (auto & tile : m_tiles) {
         tile->setEnabled(true);
@@ -128,12 +137,8 @@ void MainWindow::restartGame()
     ui->time_label->setText("00:00");
     ui->turns_count_label->setText("0");
 
-    // Удаляем таймер, создаём новый
-    delete m_timer;
-    m_timer = new QTimer();
-    // Настраиваем таймер
-    m_timer->setInterval(1000);
-    connect(m_timer, &QTimer::timeout, this, &MainWindow::updateTimer);
+    // Останавливаем таймер
+    m_timer->stop();
 
     // Обнуляем счётчики ходов
     m_time_passed.setHMS(0, 0, 0);
@@ -198,6 +203,36 @@ bool MainWindow::isSolvable()
 
     sum += 1 + ((m_tiles.size() - 1) / m_row_count);
     return (sum % 2 == 0);
+}
+
+bool MainWindow::isSolved()
+{
+    bool isSolved = true;
+
+    for (const auto &tile : m_tiles) {
+        if(tile->get_current_pos() != tile->get_initial_pos())
+            isSolved = false;
+    }
+
+    return isSolved;
+}
+
+void MainWindow::finishGame()
+{
+    m_timer->stop();
+
+    bool ok;
+
+    QString nickname = QInputDialog::getText(this, "Победа!", "Вы решили пятнашки за " + m_time_passed.toString("mm:ss") +
+                                             ". Это заняло у вас " + QString::number(m_turns_count)  + " ходов." +
+                                             "Введите своё имя для таблицы лидеров: ", QLineEdit::EchoMode::Normal, QString(), &ok);
+
+    if(ok && !nickname.isEmpty())
+        qDebug() << nickname;
+
+    // TODO добавляем человека в список лидеров
+
+    restartGame();
 }
 
 void MainWindow::updateTimer()

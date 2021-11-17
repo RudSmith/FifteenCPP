@@ -6,6 +6,10 @@
 #include <QTimer>
 #include <QTime>
 #include <QRandomGenerator>
+#include <QInputDialog>
+#include <QFile>
+#include <QIODevice>
+
 #include <algorithm>
 
 #include "tile.h"
@@ -13,6 +17,12 @@
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
+
+struct LeaderBoardEntry {
+    QString name;
+    QTime time;
+    int turns_count;
+};
 
 class MainWindow : public QMainWindow
 {
@@ -41,6 +51,10 @@ private:
     void mixTiles();
     // Проверить, решается ли текущая комбинация
     bool isSolvable();
+    // Проверить, решена ли игра
+    bool isSolved();
+    // Закончить игру и показать результат
+    void finishGame();
 
     Ui::MainWindow *ui;
     // Массив плиток
@@ -60,6 +74,9 @@ private:
     // Кол-во столбцов поля
     const int m_column_count = 4;
 
+    QVector<LeaderBoardEntry> m_entries;
+
+    // TODO убрать
     bool m_is_game_started;
 };
 #endif // MAINWINDOW_H
