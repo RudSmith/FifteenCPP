@@ -20,25 +20,25 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-public slots:
+private slots:
     // Получен сигнал о перемещении плитки, обрабатываем его
     void moveTile(Tile * tile_to_move);
     // Обновить таймер
     void updateTimer();
+    // Начать игру
+    void restartGame();
 
 private:
     // Проверить, куда можно передвинуть плитку
     QPoint checkTilePossibleTurn(QPoint tile_pos);
     // Обновить счётчик ходов
     void updateTurnsCount();
-    // Начать игру
-    void startGame();
 
     Ui::MainWindow *ui;
     // Массив плиток
     QVector<Tile*> m_tiles;
     // Время игры пользователя
-    QTimer m_timer;
+    QTimer * m_timer;
     // Время с начала игры
     QTime m_time_passed;
 

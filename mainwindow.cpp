@@ -18,14 +18,22 @@ MainWindow::MainWindow(QWidget *parent)
             if(i * m_row_count + j == m_row_count * m_column_count - 1)
                 break;
             m_tiles[i * m_row_count + j] = new Tile(QPoint(i, j));
+
+            // TODO Убрать позже!!
+            m_tiles[i * m_row_count + j]->setText(QString::number(i * m_row_count + j));
+
             ui->gridLayout->addWidget(m_tiles[i * m_row_count + j], i, j);
             connect(m_tiles[i * m_row_count + j], &Tile::needToMove, this, &MainWindow::moveTile);
         }
     }
 
     // Настраиваем таймер
-    m_timer.setInterval(1000);
-    connect(&m_timer, &QTimer::timeout, this, &MainWindow::updateTimer);
+    m_timer = new QTimer();
+    m_timer->setInterval(1000);
+    connect(m_timer, &QTimer::timeout, this, &MainWindow::updateTimer);
+
+    // Настраиваем кнопку "Начать заново"
+    connect(ui->replay_pushButton, &QPushButton::clicked, this, &MainWindow::restartGame);
 }
 
 MainWindow::~MainWindow()
@@ -48,8 +56,9 @@ void MainWindow::moveTile(Tile * tile_to_move)
 
     // Обновляем счётчик ходов, если плитка сдвинулась
     if(new_pos != tile_to_move->get_current_pos()) {
+        // Если ходов ещё не было, запускаем таймер
         if(m_turns_count == 0)
-            startGame();
+            m_timer->start();
 
         updateTurnsCount();
     }
@@ -59,6 +68,7 @@ void MainWindow::moveTile(Tile * tile_to_move)
     ui->gridLayout->addItem(tile_at_grid, new_pos.x(), new_pos.y());
 }
 
+// TODO refactor
 QPoint MainWindow::checkTilePossibleTurn(QPoint tile_pos)
 {
     int new_x{};
@@ -95,9 +105,29 @@ void MainWindow::updateTurnsCount()
     ui->turns_count_label->setText(QString::number(m_turns_count));
 }
 
-void MainWindow::startGame()
+void MainWindow::restartGame()
 {
-    m_timer.start();
+    ui->time_label->setText("00:00");
+    ui->turns_count_label->setText("0");
+
+    // Удаляем таймер, создаём новый
+    delete m_timer;
+    m_timer = new QTimer();
+    // Настраиваем таймер
+    m_timer->setInterval(1000);
+    connect(m_timer, &QTimer::timeout, this, &MainWindow::updateTimer);
+
+    // Обнуляем счётчики ходов
+    m_time_passed.setHMS(0, 0, 0);
+    m_turns_count = 0;
+
+    // Устанавливаем начальные позиции всем плиткам
+    for (auto & tile : m_tiles) {
+        auto tile_at_grid = ui->gridLayout->itemAtPosition(tile->get_current_pos().x(), tile->get_current_pos().y());
+        ui->gridLayout->removeItem(tile_at_grid);
+        ui->gridLayout->addItem(tile_at_grid, tile->get_initial_pos().x(), tile->get_initial_pos().y());
+        tile->set_current_pos(tile->get_initial_pos());
+    }
 }
 
 void MainWindow::updateTimer()
