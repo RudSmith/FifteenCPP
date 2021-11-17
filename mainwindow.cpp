@@ -68,35 +68,26 @@ void MainWindow::moveTile(Tile * tile_to_move)
     ui->gridLayout->addItem(tile_at_grid, new_pos.x(), new_pos.y());
 }
 
-// TODO refactor
 QPoint MainWindow::checkTilePossibleTurn(QPoint tile_pos)
 {
-    int new_x{};
-    int new_y{};
-
     // Определяем, куда её нужно поместить
     if(tile_pos.y() > 0 && ui->gridLayout->itemAtPosition(tile_pos.x(), tile_pos.y() - 1) == nullptr){
-        new_x = tile_pos.x();
-        new_y = tile_pos.y() - 1;
+        return QPoint(tile_pos.x(), tile_pos.y() - 1);
     }
     else if (tile_pos.y() < m_column_count - 1 && ui->gridLayout->itemAtPosition(tile_pos.x(), tile_pos.y() + 1) == nullptr){
-        new_x = tile_pos.x();
-        new_y = tile_pos.y() + 1;
+        return QPoint(tile_pos.x(), tile_pos.y() + 1);
     }
     else if (tile_pos.x() > 0 && ui->gridLayout->itemAtPosition(tile_pos.x() - 1, tile_pos.y()) == nullptr){
-        new_x = tile_pos.x() - 1;
-        new_y = tile_pos.y();
+        return QPoint(tile_pos.x() - 1, tile_pos.y());
     }
     else if (tile_pos.x() < m_row_count - 1 && ui->gridLayout->itemAtPosition(tile_pos.x() + 1, tile_pos.y()) == nullptr){
-        new_x = tile_pos.x() + 1;
-        new_y = tile_pos.y();
+        return QPoint(tile_pos.x() + 1, tile_pos.y());
     }
     else {
-        new_x = tile_pos.x();
-        new_y = tile_pos.y();
+        return QPoint(tile_pos.x(), tile_pos.y());
     }
 
-    return QPoint(new_x, new_y);
+    return QPoint();
 }
 
 void MainWindow::updateTurnsCount()
