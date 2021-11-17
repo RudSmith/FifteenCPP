@@ -3,7 +3,9 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
-      ui(new Ui::MainWindow)
+      ui(new Ui::MainWindow),
+      m_time_passed(0, 0, 0),
+      m_turns_count{}
 {
     ui->setupUi(this);
 
@@ -20,6 +22,10 @@ MainWindow::MainWindow(QWidget *parent)
             connect(m_tiles[i * m_row_count + j], &Tile::needToMove, this, &MainWindow::moveTile);
         }
     }
+
+    // Настраиваем таймер
+    m_timer.setInterval(1000);
+    connect(&m_timer, &QTimer::timeout, this, &MainWindow::updateTimer);
 }
 
 MainWindow::~MainWindow()
@@ -39,6 +45,14 @@ void MainWindow::moveTile(Tile * tile_to_move)
 
     // Проверяем, куда плитку можно переместить
     QPoint new_pos = checkTilePossibleTurn(tile_to_move->get_current_pos());
+
+    // Обновляем счётчик ходов, если плитка сдвинулась
+    if(new_pos != tile_to_move->get_current_pos()) {
+        if(m_turns_count == 0)
+            startGame();
+
+        updateTurnsCount();
+    }
 
     // Помещаем её на новую позицию, перед этим обновив свойство current_pos у Tile
     tile_to_move->set_current_pos(new_pos);
@@ -73,5 +87,22 @@ QPoint MainWindow::checkTilePossibleTurn(QPoint tile_pos)
     }
 
     return QPoint(new_x, new_y);
+}
+
+void MainWindow::updateTurnsCount()
+{
+    m_turns_count++;
+    ui->turns_count_label->setText(QString::number(m_turns_count));
+}
+
+void MainWindow::startGame()
+{
+    m_timer.start();
+}
+
+void MainWindow::updateTimer()
+{
+    m_time_passed = m_time_passed.addSecs(1);
+    ui->time_label->setText(m_time_passed.toString("mm:ss"));
 }
 

@@ -3,6 +3,9 @@
 
 #include <QMainWindow>
 #include <QVector>
+#include <QTimer>
+#include <QTime>
+
 #include "tile.h"
 
 QT_BEGIN_NAMESPACE
@@ -20,14 +23,26 @@ public:
 public slots:
     // Получен сигнал о перемещении плитки, обрабатываем его
     void moveTile(Tile * tile_to_move);
+    // Обновить таймер
+    void updateTimer();
 
 private:
     // Проверить, куда можно передвинуть плитку
     QPoint checkTilePossibleTurn(QPoint tile_pos);
+    // Обновить счётчик ходов
+    void updateTurnsCount();
+    // Начать игру
+    void startGame();
 
     Ui::MainWindow *ui;
     // Массив плиток
     QVector<Tile*> m_tiles;
+    // Время игры пользователя
+    QTimer m_timer;
+    // Время с начала игры
+    QTime m_time_passed;
+
+    int m_turns_count;
 
     // Количество плиток
     const int m_tiles_count = 15;
