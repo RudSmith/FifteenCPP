@@ -44,11 +44,13 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->start_pushButton, &QPushButton::clicked, this, &MainWindow::startGame);
 
     // TODO Считываем таблицу лидеров
-
+    connect(ui->leaderboard_pushButton, &QPushButton::clicked, this, &MainWindow::showLeaders);
+    readLeaders();
 }
 
 MainWindow::~MainWindow()
 {
+    writeLeaders();
     for (int i = 0; i < m_tiles.size(); ++i) {
         delete m_tiles[i];
     }
@@ -227,12 +229,67 @@ void MainWindow::finishGame()
                                              ". Это заняло у вас " + QString::number(m_turns_count)  + " ходов." +
                                              "Введите своё имя для таблицы лидеров: ", QLineEdit::EchoMode::Normal, QString(), &ok);
 
-    if(ok && !nickname.isEmpty())
-        qDebug() << nickname;
-
-    // TODO добавляем человека в список лидеров
+    if(ok && !nickname.isEmpty()) {
+        addLeader(LeaderBoardEntry(nickname, m_time_passed, m_turns_count));
+    }
 
     restartGame();
+}
+
+void MainWindow::showLeaders()
+{
+    QMessageBox mb;
+
+    for(auto & entry : m_entries){
+        mb.setText(mb.text() + entry.toString());
+    }
+
+    mb.exec();
+
+}
+
+void MainWindow::readLeaders()
+{
+    QFile leaders_file("leaders.txt");
+    leaders_file.open(QIODevice::ReadOnly | QIODevice::Text);
+
+    while(!leaders_file.atEnd()){
+        QString cur_entry = leaders_file.readLine();
+        QStringList splitted_entry = cur_entry.split(" ");
+
+        QString nick = splitted_entry[0];
+        QTime time = QTime::fromString(splitted_entry[1], "mm:ss");
+        int turns = splitted_entry[2].toInt();
+
+        m_entries.push_back(LeaderBoardEntry(nick, time, turns));
+    }
+
+    std::sort(m_entries.begin(), m_entries.end(),
+              [](const LeaderBoardEntry & e1, const LeaderBoardEntry & e2){ return e1.turns_count < e2.turns_count; });
+}
+
+// TODO сделать так, чтобы при внесении лидера с существующим ником в таблице лидеров обновлялось его время и кол-во ходов
+void MainWindow::addLeader(const LeaderBoardEntry &entry)
+{
+    m_entries.push_back(entry);
+    std::sort(m_entries.begin(), m_entries.end(),
+              [](const LeaderBoardEntry & e1, const LeaderBoardEntry & e2){ return e1.turns_count < e2.turns_count; });
+}
+
+void MainWindow::writeLeaders()
+{
+    QFile leaders_file("leaders.txt");
+    leaders_file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text);
+
+    for (auto & entry : m_entries) {
+        leaders_file.write(entry.name.toUtf8());
+        leaders_file.write(" ");
+        leaders_file.write(entry.time.toString("mm:ss").toUtf8());
+        leaders_file.write(" ");
+        leaders_file.write(QByteArray::number(entry.turns_count));
+        leaders_file.write(" ");
+        leaders_file.write("\n");
+    }
 }
 
 void MainWindow::updateTimer()

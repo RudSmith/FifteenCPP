@@ -106,6 +106,13 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QPushButton" name="leaderboard_pushButton">
+       <property name="text">
+        <string>Таблица лидеров</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </widget>
   </widget>

@@ -7,6 +7,7 @@
 #include <QTime>
 #include <QRandomGenerator>
 #include <QInputDialog>
+#include <QMessageBox>
 #include <QFile>
 #include <QIODevice>
 
@@ -19,6 +20,21 @@ namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
 struct LeaderBoardEntry {
+
+public:
+    LeaderBoardEntry(const QString & _name, const QTime & _time, int _turns_count)
+        : name { _name },
+          time { _time },
+          turns_count { _turns_count }
+    {}
+
+    QString toString() const
+    {
+        QString res = QString(name + " solved fifteen-puzzle for " +
+                              time.toString() + " and " + QString::number(turns_count) + " turns.\n");
+        return res;
+    }
+
     QString name;
     QTime time;
     int turns_count;
@@ -41,6 +57,8 @@ private slots:
     void startGame();
     // Начать игру
     void restartGame();
+    // Показать таблицу лидеров
+    void showLeaders();
 
 private:
     // Проверить, куда можно передвинуть плитку
@@ -55,6 +73,12 @@ private:
     bool isSolved();
     // Закончить игру и показать результат
     void finishGame();
+    // Считать лидеров из файла
+    void readLeaders();
+    // Добавить лидера
+    void addLeader(const LeaderBoardEntry &entry);
+    // Записать лидеров в файл
+    void writeLeaders();
 
     Ui::MainWindow *ui;
     // Массив плиток
