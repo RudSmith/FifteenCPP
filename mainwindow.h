@@ -5,6 +5,8 @@
 #include <QVector>
 #include <QTimer>
 #include <QTime>
+#include <QRandomGenerator>
+#include <algorithm>
 
 #include "tile.h"
 
@@ -27,6 +29,8 @@ private slots:
     void updateTimer();
     // Начать игру
     void restartGame();
+    // Перемешать плитки
+    void mixTiles();
 
 private:
     // Проверить, куда можно передвинуть плитку

@@ -99,6 +99,13 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QPushButton" name="mix_pushButton">
+       <property name="text">
+        <string>Перемешать</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </widget>
   </widget>
