@@ -137,12 +137,16 @@ void MainWindow::restartGame()
     m_time_passed.setHMS(0, 0, 0);
     m_turns_count = 0;
 
-    // Устанавливаем начальные позиции всем плиткам
-    for (auto & tile : m_tiles) {
-        auto tile_at_grid = ui->gridLayout->itemAtPosition(tile->get_current_pos().x(), tile->get_current_pos().y());
-        ui->gridLayout->removeItem(tile_at_grid);
-        ui->gridLayout->addItem(tile_at_grid, tile->get_initial_pos().x(), tile->get_initial_pos().y());
+    for (auto &tile : m_tiles) {
+        ui->gridLayout->removeWidget(tile);
         tile->set_current_pos(tile->get_initial_pos());
+    }
+
+    std::sort(m_tiles.begin(), m_tiles.end(), [](Tile* t1, Tile* t2){ return t1->get_value() < t2->get_value(); });
+
+    for (auto & tile : m_tiles) {
+        ui->gridLayout->addWidget(tile, tile->get_current_pos().x(), tile->get_current_pos().y());
+        qDebug() << tile->get_value() << " " << tile->get_current_pos() << " " << tile->get_initial_pos();
     }
 }
 
