@@ -6,8 +6,7 @@ MainWindow::MainWindow(QWidget *parent)
       ui(new Ui::MainWindow),
       m_timer { nullptr },
       m_time_passed(0, 0, 0),
-      m_turns_count{},
-      m_is_game_started { false }
+      m_turns_count{}
 {
     ui->setupUi(this);
 
@@ -50,7 +49,10 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    // Записываем лидеров из файла
     writeLeaders();
+
+    // очищаем память от плиток
     for (int i = 0; i < m_tiles.size(); ++i) {
         delete m_tiles[i];
     }
@@ -77,7 +79,7 @@ void MainWindow::moveTile(Tile * tile_to_move)
     tile_to_move->set_current_pos(new_pos);
     ui->gridLayout->addItem(tile_at_grid, new_pos.x(), new_pos.y());
 
-    // Если игра решена, выводим сообщение о победе
+    // Если игра решена, обрабатываем это
     if(isSolved()) {
         finishGame();
     }
@@ -85,7 +87,7 @@ void MainWindow::moveTile(Tile * tile_to_move)
 
 QPoint MainWindow::checkTilePossibleTurn(QPoint tile_pos)
 {
-    // Определяем, куда её нужно поместить
+    // Определяем, куда плитку нужно поместить
     if(tile_pos.y() > 0 && ui->gridLayout->itemAtPosition(tile_pos.x(), tile_pos.y() - 1) == nullptr){
         return QPoint(tile_pos.x(), tile_pos.y() - 1);
     }
@@ -119,7 +121,6 @@ void MainWindow::startGame()
         tile->setEnabled(true);
     }
 
-    m_is_game_started = true;
     m_timer->start();
     ui->replay_pushButton->setEnabled(true);
     ui->start_pushButton->setEnabled(false);
@@ -127,7 +128,6 @@ void MainWindow::startGame()
 
 void MainWindow::restartGame()
 {
-    m_is_game_started = false;
 
     for (auto & tile : m_tiles) {
         tile->setEnabled(false);
@@ -146,13 +146,16 @@ void MainWindow::restartGame()
     m_time_passed.setHMS(0, 0, 0);
     m_turns_count = 0;
 
+    // Удаляем с поля все плитки
     for (auto &tile : m_tiles) {
         ui->gridLayout->removeWidget(tile);
         tile->set_current_pos(tile->get_initial_pos());
     }
 
+    // Сортируем массив плиток
     std::sort(m_tiles.begin(), m_tiles.end(), [](Tile* t1, Tile* t2){ return t1->get_value() < t2->get_value(); });
 
+    // Помещаем плитки назад
     for (auto & tile : m_tiles) {
         ui->gridLayout->addWidget(tile, tile->get_current_pos().x(), tile->get_current_pos().y());
     }
@@ -160,10 +163,12 @@ void MainWindow::restartGame()
 
 void MainWindow::mixTiles()
 {
+    // Удаляем плитки с поля
     for (auto & tile : m_tiles) {
         ui->gridLayout->removeWidget(tile);
     }
 
+    // Перемешиваем плитки
     for (int i = 0; i < m_tiles.size(); ++i) {
         int new_index = QRandomGenerator::global()->bounded(0, m_tiles_count - 1);
         m_tiles.swapItemsAt(i, new_index);
@@ -173,10 +178,8 @@ void MainWindow::mixTiles()
         m_tiles[new_index]->set_current_pos(temp);
     }
 
-    int c = 0;
-
+    // Проверяем, решается ли комбинация
     while (!isSolvable()) {
-        ++c;
         for (int i = 0; i < m_tiles.size(); ++i) {
             int new_index = QRandomGenerator::global()->bounded(0, m_tiles_count - 1);
             m_tiles.swapItemsAt(i, new_index);
@@ -187,6 +190,7 @@ void MainWindow::mixTiles()
         }
     }
 
+    // Помещаем плитки на поле
     for (auto & tile : m_tiles) {
         ui->gridLayout->addWidget(tile, tile->get_current_pos().x(), tile->get_current_pos().y());
     }
@@ -194,6 +198,7 @@ void MainWindow::mixTiles()
 
 bool MainWindow::isSolvable()
 {
+    // Алгоритм взят из учебника по алгоритмам
     int sum = 0;
 
     for (int i = 0; i < m_tiles.size(); ++i) {
@@ -209,6 +214,7 @@ bool MainWindow::isSolvable()
 
 bool MainWindow::isSolved()
 {
+    // Проверяем, находятся ли все плитки на своих местах
     bool isSolved = true;
 
     for (const auto &tile : m_tiles) {
@@ -225,19 +231,23 @@ void MainWindow::finishGame()
 
     bool ok;
 
+    // Выводим диалог с предложением ввести ник
     QString nickname = QInputDialog::getText(this, "Победа!", "Вы решили пятнашки за " + m_time_passed.toString("mm:ss") +
                                              ". Это заняло у вас " + QString::number(m_turns_count)  + " ходов." +
                                              "Введите своё имя для таблицы лидеров: ", QLineEdit::EchoMode::Normal, QString(), &ok);
 
+    // Если нажата кнопка ОК, записываем результат в таблицу лидеров
     if(ok && !nickname.isEmpty()) {
         addLeader(LeaderBoardEntry(nickname, m_time_passed, m_turns_count));
     }
 
+    // Очищаем поле
     restartGame();
 }
 
 void MainWindow::showLeaders()
 {
+    // Простой вывод в messageBox
     QMessageBox mb;
     mb.setWindowTitle("Таблица лидеров");
 
@@ -250,6 +260,7 @@ void MainWindow::showLeaders()
 
 void MainWindow::readLeaders()
 {
+    // Открываем файл, читаем оттуда всё
     QFile leaders_file("leaders.txt");
     leaders_file.open(QIODevice::ReadOnly | QIODevice::Text);
 
@@ -264,6 +275,7 @@ void MainWindow::readLeaders()
         m_entries.push_back(LeaderBoardEntry(nick, time, turns));
     }
 
+    // Сортируем вектор с лидерами по следующему критерию: если кол-во ходов одинаково, сравниваем результаты по времени, иначе по кол-ву ходов
     std::sort(m_entries.begin(), m_entries.end(),
               [](const LeaderBoardEntry & e1, const LeaderBoardEntry & e2)
               { return (e1.turns_count == e2.turns_count ? e1.time < e2.time : e1.turns_count < e2.turns_count); });
@@ -271,6 +283,7 @@ void MainWindow::readLeaders()
 
 void MainWindow::addLeader(const LeaderBoardEntry &entry)
 {
+    // Здесь проверяем, есть ли уже лидер с указанным ником
    LeaderBoardEntry * existing_leader = nullptr;
 
    for (auto & leader : m_entries) {
@@ -278,6 +291,7 @@ void MainWindow::addLeader(const LeaderBoardEntry &entry)
            existing_leader = &leader;
    }
 
+    // Если есть, обновляем его результат
     if(existing_leader != nullptr){
         existing_leader->time = entry.time;
         existing_leader->turns_count = entry.turns_count;
@@ -285,6 +299,7 @@ void MainWindow::addLeader(const LeaderBoardEntry &entry)
     else
         m_entries.push_back(entry);
 
+    // Сортируем вектор лидеров
     std::sort(m_entries.begin(), m_entries.end(),
               [](const LeaderBoardEntry & e1, const LeaderBoardEntry & e2)
               { return (e1.turns_count == e2.turns_count ? e1.time < e2.time : e1.turns_count < e2.turns_count); });
@@ -292,6 +307,7 @@ void MainWindow::addLeader(const LeaderBoardEntry &entry)
 
 void MainWindow::writeLeaders()
 {
+    // В деструкторе окна выписываем всех отсортированных лидеров назад в файл
     QFile leaders_file("leaders.txt");
     leaders_file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text);
 

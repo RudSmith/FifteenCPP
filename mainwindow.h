@@ -19,8 +19,8 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
+// Структура, обозначающая результат игры
 struct LeaderBoardEntry {
-
 public:
     LeaderBoardEntry(const QString & _name, const QTime & _time, int _turns_count)
         : name { _name },
@@ -102,9 +102,7 @@ private:
     // Кол-во столбцов поля
     const int m_column_count = 4;
 
+    // Вектор с результатами игр
     QVector<LeaderBoardEntry> m_entries;
-
-    // TODO убрать
-    bool m_is_game_started;
 };
 #endif // MAINWINDOW_H
