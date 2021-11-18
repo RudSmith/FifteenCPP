@@ -21,7 +21,6 @@ MainWindow::MainWindow(QWidget *parent)
             m_tiles[i * m_row_count + j] = new Tile(QPoint(i, j), i * m_row_count + j + 1);
             m_tiles[i * m_row_count + j]->setEnabled(false);
 
-            // TODO Убрать позже!!
             m_tiles[i * m_row_count + j]->setText(QString::number(m_tiles[i * m_row_count + j]->get_value()));
 
             ui->gridLayout->addWidget(m_tiles[i * m_row_count + j], i, j);
@@ -350,12 +349,12 @@ void MainWindow::setImage()
         m_tiles[i]->setIcon(pieces[i]);
         m_tiles[i]->setIconSize(QSize(pieces[i].size()));
     }
-
-    qDebug() << pieces.size();
  }
 
 QImage MainWindow::createSubImage(QImage *image, const QRect &rect)
 {
+    // https://stackoverflow.com/questions/12681554/dividing-qimage-to-smaller-pieces
+
     size_t offset = rect.x() * image->depth() / 8
             + rect.y() * image->bytesPerLine();
     return QImage(image->bits() + offset, rect.width(), rect.height(),
