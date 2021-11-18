@@ -120,7 +120,7 @@ void MainWindow::updateTurnsCount()
 
 void MainWindow::startGame()
 {
-    //mixTiles();
+    mixTiles();
 
     for (auto & tile : m_tiles) {
         tile->setEnabled(true);
