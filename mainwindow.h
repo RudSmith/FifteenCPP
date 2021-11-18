@@ -3,11 +3,19 @@
 
 #include <QMainWindow>
 #include <QVector>
+
 #include <QTimer>
 #include <QTime>
+
 #include <QRandomGenerator>
+
+#include <QIcon>
+#include <QImage>
+
 #include <QInputDialog>
+#include <QFileDialog>
 #include <QMessageBox>
+
 #include <QFile>
 #include <QIODevice>
 
@@ -83,6 +91,10 @@ private:
     void addLeader(const LeaderBoardEntry &entry);
     // Записать лидеров в файл
     void writeLeaders();
+    // Установить картинку на плитки
+    void setImage();
+    // Выделить из картинки кусочек, равный rect
+    QImage createSubImage(QImage* image, const QRect & rect);
 
     Ui::MainWindow *ui;
     // Массив плиток
@@ -104,5 +116,8 @@ private:
 
     // Вектор с результатами игр
     QVector<LeaderBoardEntry> m_entries;
+
+    // Картинка поля
+    QImage m_image;
 };
 #endif // MAINWINDOW_H

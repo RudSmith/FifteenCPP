@@ -36,20 +36,25 @@ MainWindow::MainWindow(QWidget *parent)
     m_timer->setInterval(1000);
     connect(m_timer, &QTimer::timeout, this, &MainWindow::updateTimer);
 
-    // Настраиваем кнопку "Начать заново"
+    //Коннектим кнопку "Начать заново"
     connect(ui->replay_pushButton, &QPushButton::clicked, this, &MainWindow::restartGame);
 
-    // Настраиваем кнопку "Перемешать"
+    // Коннектим кнопку "Перемешать"
     connect(ui->start_pushButton, &QPushButton::clicked, this, &MainWindow::startGame);
 
-    // TODO Считываем таблицу лидеров
+    // Коннектим кнопку "Таблица лидеров"
     connect(ui->leaderboard_pushButton, &QPushButton::clicked, this, &MainWindow::showLeaders);
+
+    // Коннектим кнопку "Таблица лидеров"
+    connect(ui->upload_image_pushButton, &QPushButton::clicked, this, &MainWindow::setImage);
+
+    // Считываем лидеров из файла
     readLeaders();
 }
 
 MainWindow::~MainWindow()
 {
-    // Записываем лидеров из файла
+    // Записываем лидеров в файл
     writeLeaders();
 
     // очищаем память от плиток
@@ -122,6 +127,7 @@ void MainWindow::startGame()
     }
 
     m_timer->start();
+    ui->upload_image_pushButton->setEnabled(false);
     ui->replay_pushButton->setEnabled(true);
     ui->start_pushButton->setEnabled(false);
 }
@@ -133,6 +139,7 @@ void MainWindow::restartGame()
         tile->setEnabled(false);
     }
 
+    ui->upload_image_pushButton->setEnabled(true);
     ui->replay_pushButton->setEnabled(false);
     ui->start_pushButton->setEnabled(true);
 
@@ -320,6 +327,39 @@ void MainWindow::writeLeaders()
         leaders_file.write(" ");
         leaders_file.write("\n");
     }
+}
+
+void MainWindow::setImage()
+{
+    auto fileName = QFileDialog::getOpenFileName(this,
+        tr("Open Image"), "", tr("Image Files (*.png *.jpg *.bmp)"));
+
+    m_image.load(fileName);
+    m_image = m_image.scaled(592, 480);
+
+    QVector<QPixmap> pieces;
+
+    for(int i = 0; i < m_row_count; i++){
+        for (int j = 0; j < 592; j += 148) {
+            pieces.push_back(QPixmap::fromImage(createSubImage(&m_image, QRect(QPoint(j, i * 120), QPoint(j + 148, (i + 1) * 120)))));
+        }
+    }
+
+    for (int i = 0; i < m_tiles.size(); ++i) {
+        pieces[i] = pieces[i].scaled(165, 120);
+        m_tiles[i]->setIcon(pieces[i]);
+        m_tiles[i]->setIconSize(QSize(pieces[i].size()));
+    }
+
+    qDebug() << pieces.size();
+ }
+
+QImage MainWindow::createSubImage(QImage *image, const QRect &rect)
+{
+    size_t offset = rect.x() * image->depth() / 8
+            + rect.y() * image->bytesPerLine();
+    return QImage(image->bits() + offset, rect.width(), rect.height(),
+                  image->bytesPerLine(), image->format());
 }
 
 void MainWindow::updateTimer()
