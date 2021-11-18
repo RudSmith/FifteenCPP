@@ -239,13 +239,13 @@ void MainWindow::finishGame()
 void MainWindow::showLeaders()
 {
     QMessageBox mb;
+    mb.setWindowTitle("Таблица лидеров");
 
     for(auto & entry : m_entries){
         mb.setText(mb.text() + entry.toString());
     }
 
     mb.exec();
-
 }
 
 void MainWindow::readLeaders()
@@ -265,15 +265,29 @@ void MainWindow::readLeaders()
     }
 
     std::sort(m_entries.begin(), m_entries.end(),
-              [](const LeaderBoardEntry & e1, const LeaderBoardEntry & e2){ return e1.turns_count < e2.turns_count; });
+              [](const LeaderBoardEntry & e1, const LeaderBoardEntry & e2)
+              { return (e1.turns_count == e2.turns_count ? e1.time < e2.time : e1.turns_count < e2.turns_count); });
 }
 
-// TODO сделать так, чтобы при внесении лидера с существующим ником в таблице лидеров обновлялось его время и кол-во ходов
 void MainWindow::addLeader(const LeaderBoardEntry &entry)
 {
-    m_entries.push_back(entry);
+   LeaderBoardEntry * existing_leader = nullptr;
+
+   for (auto & leader : m_entries) {
+       if(leader.name == entry.name)
+           existing_leader = &leader;
+   }
+
+    if(existing_leader != nullptr){
+        existing_leader->time = entry.time;
+        existing_leader->turns_count = entry.turns_count;
+    }
+    else
+        m_entries.push_back(entry);
+
     std::sort(m_entries.begin(), m_entries.end(),
-              [](const LeaderBoardEntry & e1, const LeaderBoardEntry & e2){ return e1.turns_count < e2.turns_count; });
+              [](const LeaderBoardEntry & e1, const LeaderBoardEntry & e2)
+              { return (e1.turns_count == e2.turns_count ? e1.time < e2.time : e1.turns_count < e2.turns_count); });
 }
 
 void MainWindow::writeLeaders()

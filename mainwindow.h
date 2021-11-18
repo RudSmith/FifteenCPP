@@ -28,10 +28,14 @@ public:
           turns_count { _turns_count }
     {}
 
+    bool operator==(const LeaderBoardEntry &rhs){
+        return (name == rhs.name && time == rhs.time && turns_count == rhs.turns_count);
+    }
+
     QString toString() const
     {
-        QString res = QString(name + " solved fifteen-puzzle for " +
-                              time.toString() + " and " + QString::number(turns_count) + " turns.\n");
+        QString res = QString(name + " \t " +
+                              time.toString() + " \t " + QString::number(turns_count) + " ход(-a/-ов).\n");
         return res;
     }
 
