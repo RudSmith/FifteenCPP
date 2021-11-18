@@ -14,8 +14,8 @@ Tile::Tile(QPoint init_pos, int value, QWidget *parent)
       m_current_pos { m_initial_pos },
       m_value { value }
 {
-    setMinimumSize(101, 81);
-    setMaximumSize(101, 81);
+    setMinimumSize(148, 120);
+    setMaximumSize(148, 120);
 }
 
 QPoint Tile::get_initial_pos() const
