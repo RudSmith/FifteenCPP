@@ -340,7 +340,7 @@ void MainWindow::setImage()
 
     for(int i = 0; i < m_row_count; i++){
         for (int j = 0; j < 592; j += 148) {
-            pieces.push_back(QPixmap::fromImage(createSubImage(&m_image, QRect(QPoint(j, i * 120), QPoint(j + 148, (i + 1) * 120)))));
+            pieces.push_back(QPixmap::fromImage(QImage(createSubImage(&m_image, QRect(QPoint(j, i * 120), QPoint(j + 148, (i + 1) * 120))))));
         }
     }
 
