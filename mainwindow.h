@@ -3,22 +3,15 @@
 
 #include <QMainWindow>
 #include <QVector>
-
 #include <QTimer>
 #include <QTime>
-
 #include <QRandomGenerator>
-
-#include <QIcon>
 #include <QImage>
-
 #include <QInputDialog>
 #include <QFileDialog>
 #include <QMessageBox>
-
 #include <QFile>
 #include <QIODevice>
-
 #include <algorithm>
 
 #include "tile.h"

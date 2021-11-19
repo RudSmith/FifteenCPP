@@ -330,22 +330,34 @@ void MainWindow::writeLeaders()
 
 void MainWindow::setImage()
 {
+    // Открываем файл с картинкой
     auto fileName = QFileDialog::getOpenFileName(this,
         tr("Open Image"), "", tr("Image Files (*.png *.jpg *.bmp)"));
 
-    m_image.load(fileName);
-    m_image = m_image.scaled(592, 480);
+    // Сжимаем картинку
+    const int image_width = 660;
+    const int image_height = 480;
 
+    m_image.load(fileName);
+    m_image = m_image.scaled(image_width, image_height);
+
+    // Создаём вектор кусков картинки
     QVector<QPixmap> pieces;
 
+    // Задаём размеры куска
+    const int piece_width = image_width / m_row_count;
+    const int piece_height = image_height / m_column_count;
+
+    // В цикле генерируем 16 кусков
     for(int i = 0; i < m_row_count; i++){
-        for (int j = 0; j < 592; j += 148) {
-            pieces.push_back(QPixmap::fromImage(QImage(createSubImage(&m_image, QRect(QPoint(j, i * 120), QPoint(j + 148, (i + 1) * 120))))));
+        for (int j = 0; j < image_width; j += piece_width) {
+            pieces.push_back(QPixmap::fromImage(QImage(createSubImage
+                                                       (&m_image, QRect(QPoint(j, i * piece_height), QPoint(j + piece_width, (i + 1) * piece_height))))));
         }
     }
 
+    // Выставляем каждой плитке иконку и задаём ей размер
     for (int i = 0; i < m_tiles.size(); ++i) {
-        pieces[i] = pieces[i].scaled(165, 120);
         m_tiles[i]->setIcon(pieces[i]);
         m_tiles[i]->setIconSize(QSize(pieces[i].size()));
     }
