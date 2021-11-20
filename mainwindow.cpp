@@ -44,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent)
     // Коннектим кнопку "Таблица лидеров"
     connect(ui->leaderboard_pushButton, &QPushButton::clicked, this, &MainWindow::showLeaders);
 
-    // Коннектим кнопку "Таблица лидеров"
+    // Коннектим кнопку "Загрузить изображение"
     connect(ui->upload_image_pushButton, &QPushButton::clicked, this, &MainWindow::setImage);
 
     // Считываем лидеров из файла
